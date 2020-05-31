@@ -1,0 +1,57 @@
+version: "3.1"
+services:
+  base-java-service:
+    container_name: base-java
+    image: base-java:latest
+    build:
+      context: ./docker/
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/var/www
+    entrypoint: ["/bin/sh", "./docker/entrypoint.sh"]
+    # command: mvn exec:java -Dexec.mainClass=br.com.ruyjfs.base -Plocal
+    command: ./mvnw spring-boot:run
+    tty: true
+    restart: on-failure
+    # redis:
+    #   container_name: ${APP_NAME}-redis
+    #   image: redis:alpine
+    #   ports:
+    #   - 6379:6379
+    #   tty: true
+    #   restart: on-failure
+    # db:
+    #   container_name: ${APP_NAME}-db
+    #   image: postgres:alpine
+    #   environment:
+    #     POSTGRES_DB: ${APP_NAME}
+    #     POSTGRES_USER: ${APP_NAME}
+    #     POSTGRES_PASSWORD: ${APP_NAME}
+    #   ports:
+    #   - 5432:5432
+    #   tty: true
+    #   restart: on-failure
+    # links:
+    # - redis:redis
+    # - db:db
+    # depends_on:
+    #   - redis
+    #   - db
+  # front:
+  #   container_name: ${APP_NAME}-front
+  #   image: ${APP_NAME}-front:latest
+  #   build:
+  #     context: ./front/docker/
+  #   volumes:
+  #   - ./front/:/var/wwwn
+  #   ports:
+  #   - 4200:4200
+  #   entrypoint: [ "/bin/sh" , "./docker/entrypoint.sh" ]
+  #   command: ng serve --host 0.0.0.0
+  #   links:
+  #     - back:back
+  #   depends_on:
+  #     - back
+  #   tty: true
+  #   restart: on-failure
