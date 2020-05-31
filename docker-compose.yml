@@ -1,8 +1,29 @@
 version: "3.1"
 services:
-  base-java-service:
-    container_name: base-java
-    image: base-java:latest
+  base-java-mongodb-service:
+    container_name: base-java-mongodb
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: base-java-db
+      MONGO_INITDB_ROOT_USERNAME: base-java-usr
+      MONGO_INITDB_ROOT_PASSWORD: base-java-psw
+    ports:
+      - 27017:27017
+    volumes:
+      - ./database/mongodb/scripts/001_users.js:/docker-entrypoint-initdb.d/001_users.js:ro
+      - ./database/mongodb/data/:/data/db
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: base-java-usr
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: base-java-psw
+  base-java-springboot-service:
+    container_name: base-java-springboot
+    image: jdk:8
     build:
       context: ./docker/
     ports:
@@ -14,6 +35,12 @@ services:
     command: ./mvnw spring-boot:run
     tty: true
     restart: on-failure
+    links:
+      # - redis:redis
+      - base-java-mongodb-service:base-java-mongodb-service
+    depends_on:
+      # - redis
+      - base-java-mongodb-service
     # redis:
     #   container_name: ${APP_NAME}-redis
     #   image: redis:alpine
